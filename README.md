@@ -85,7 +85,7 @@ See `all_100_questions.csv`.
 ### 1. Install
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/MDT-LLM.git
+git clone https://github.com/deepdoctor/MDT-LLM.git
 cd MDT-LLM
 pip install -r requirements.txt
 ```
