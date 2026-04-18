@@ -1,9 +1,16 @@
-"""Figure 1: MDT-LLM Architecture (publication-quality v2)."""
+"""Figure 1: MDT-LLM Architecture (publication-quality v3 — minimalist).
+
+Design principles:
+- Single vertical flow axis, minimal arrow crossings.
+- Specialists collapsed inside ONE Phase-1 container (no 4 parallel arrows).
+- RAG rendered as a sidecar module, attached by a single augmentation arrow.
+- Evaluation layer as a single container with internal horizontal micro-flow.
+- Total of 5 main arrows (vs. ~15 in v2).
+"""
 
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch, FancyArrowPatch, Rectangle
 from matplotlib.lines import Line2D
-from matplotlib.patheffects import withStroke
 import numpy as np
 
 plt.rcParams.update({
@@ -13,291 +20,287 @@ plt.rcParams.update({
     "figure.dpi": 200,
     "savefig.bbox": "tight",
     "savefig.dpi": 300,
-    "pdf.fonttype": 42,   # Embed fonts (Type-1) for Elsevier compliance
+    "pdf.fonttype": 42,
     "ps.fonttype": 42,
 })
 
-# ──────────────── Design tokens (consistent palette) ────────────────
-COLOR = {
-    "input_fill":   "#FEF3C7", "input_edge":   "#D97706",
-    "rag_fill":     "#DCFCE7", "rag_edge":     "#047857", "rag_text": "#065F46",
-    "spec_fill":    "#DBEAFE", "spec_edge":    "#1D4ED8", "spec_text": "#1E3A8A",
-    "mod_fill":     "#BFDBFE", "mod_edge":     "#1D4ED8", "mod_text":  "#1E3A8A",
-    "out_fill":     "#E0E7FF", "out_edge":     "#4338CA",
-    "eval_fill":    "#FCE7F3", "eval_edge":    "#BE185D", "eval_text": "#9D174D",
-    "gold_fill":    "#FEF9C3", "gold_edge":    "#CA8A04",
-    "zone_fill":    "#F8FAFC", "zone_edge":    "#CBD5E1",
-    "arrow_main":   "#1F2937",
-    "arrow_rag":    "#047857",
-    "arrow_eval":   "#BE185D",
-    "title":        "#0F172A",
+# ──────────────── Palette ────────────────
+C = {
+    # backgrounds
+    "input":    ("#FEF3C7", "#D97706"),
+    "phase1":   ("#EFF6FF", "#2563EB"),   # light blue container
+    "agent":    ("#DBEAFE", "#1D4ED8"),   # individual agent card
+    "rag":      ("#ECFDF5", "#059669"),   # RAG sidecar
+    "phase2":   ("#EEF2FF", "#4338CA"),
+    "moderator":("#C7D2FE", "#312E81"),
+    "output":   ("#F5F3FF", "#6D28D9"),
+    "evalbg":   ("#FDF2F8", "#BE185D"),
+    "judge":    ("#FCE7F3", "#9D174D"),
+    "gold":     ("#FEF9C3", "#A16207"),
+    # arrows
+    "a_main":   "#111827",
+    "a_rag":    "#059669",
+    "a_eval":   "#BE185D",
+    # text
+    "t_title":  "#0F172A",
+    "t_dim":    "#475569",
 }
-
-FS_TITLE   = 14
-FS_HEADER  = 9.5
-FS_BOX     = 8.5
-FS_SMALL   = 7.5
 
 
 # ──────────────── Canvas ────────────────
-fig, ax = plt.subplots(figsize=(16, 9.5))
-ax.set_xlim(0, 18)
-ax.set_ylim(0, 11)
+fig, ax = plt.subplots(figsize=(12, 12.5))
+ax.set_xlim(0, 12)
+ax.set_ylim(0, 13)
 ax.set_aspect('equal')
 ax.axis('off')
 
 
 # ──────────────── Helpers ────────────────
-def rounded(x, y, w, h, fc, ec, lw=1.1, alpha=1.0, rounding=0.15):
+def rbox(x, y, w, h, fc, ec, lw=1.2, alpha=1.0, r=0.14, zorder=2):
     p = FancyBboxPatch((x, y), w, h,
-                       boxstyle=f"round,pad=0.03,rounding_size={rounding}",
-                       linewidth=lw, edgecolor=ec, facecolor=fc, alpha=alpha,
-                       joinstyle='round')
+                       boxstyle=f"round,pad=0.02,rounding_size={r}",
+                       linewidth=lw, edgecolor=ec, facecolor=fc,
+                       alpha=alpha, zorder=zorder, joinstyle='round')
     ax.add_patch(p)
-    return p
 
 
-def text_in(x, y, w, h, title, body, color_title=None, color_body='#1F2937',
-            fs_title=FS_HEADER, fs_body=FS_SMALL):
-    cx, cy = x + w/2, y + h/2
-    color_title = color_title or '#0F172A'
-    if title and body:
-        ax.text(cx, cy + 0.18, title, ha='center', va='center',
-                fontsize=fs_title, fontweight='bold', color=color_title)
-        ax.text(cx, cy - 0.25, body, ha='center', va='center',
-                fontsize=fs_body, color=color_body, linespacing=1.25)
-    elif title:
-        ax.text(cx, cy, title, ha='center', va='center',
-                fontsize=fs_title, fontweight='bold', color=color_title)
-    else:
-        ax.text(cx, cy, body, ha='center', va='center',
-                fontsize=fs_body, color=color_body, linespacing=1.25)
+def stext(x, y, s, fs=9, fw='normal', color=None, ha='center', va='center',
+          zorder=4, style='normal'):
+    ax.text(x, y, s, fontsize=fs, fontweight=fw, fontstyle=style,
+            color=color or C['t_title'], ha=ha, va=va, zorder=zorder)
 
 
-def arrow(x1, y1, x2, y2, color, lw=1.4, ls='-', shrink=6,
-          style='-|>', mutation=14):
+def arrow(x1, y1, x2, y2, color, lw=1.6, ls='-', shrink=5, mutation=16):
     a = FancyArrowPatch((x1, y1), (x2, y2),
-                        arrowstyle=style, mutation_scale=mutation,
+                        arrowstyle='-|>', mutation_scale=mutation,
                         color=color, linewidth=lw, linestyle=ls,
                         shrinkA=shrink, shrinkB=shrink,
-                        zorder=3,
-                        capstyle='round', joinstyle='round')
+                        zorder=3, capstyle='round', joinstyle='round')
     ax.add_patch(a)
 
 
-def zone(x, y, w, h, label, color='#64748B'):
-    """Light background zone with a label ABOVE the zone (no overlap with contents)."""
-    p = Rectangle((x, y), w, h,
-                  facecolor=COLOR['zone_fill'], edgecolor=COLOR['zone_edge'],
-                  linewidth=0.6, linestyle=(0, (4, 3)), alpha=0.6, zorder=0)
-    ax.add_patch(p)
-    # Label placed as a "tab" on top of the zone
-    tab_width = min(len(label) * 0.11 + 0.4, w - 0.4)
-    tab = Rectangle((x + 0.2, y + h - 0.02), tab_width, 0.34,
-                    facecolor='white', edgecolor=color,
-                    linewidth=0.8, zorder=2)
-    ax.add_patch(tab)
-    ax.text(x + 0.2 + tab_width/2, y + h + 0.15, label, ha='center', va='center',
-            fontsize=8.5, color=color, fontweight='bold', zorder=3)
-
-
 # ──────────────── Title ────────────────
-ax.text(9, 10.55, "MDT-LLM Architecture",
-        ha='center', va='center', fontsize=FS_TITLE,
-        fontweight='bold', color=COLOR['title'])
+stext(6, 12.55, "MDT-LLM Architecture",
+      fs=15, fw='bold', color=C['t_title'])
 
 
 # ══════════════════════════════════════════════════════════════════
-#  Row 0: INPUT  (top, centered)
+# 1)  INPUT  (top-center)
 # ══════════════════════════════════════════════════════════════════
-INPUT = (5.5, 9.15, 7.0, 0.9)
-rounded(*INPUT, fc=COLOR['input_fill'], ec=COLOR['input_edge'], lw=1.3)
-text_in(*INPUT,
-        title="Clinical Vignette + Question",
-        body="(e.g., stage IV NSCLC, EGFR exon 19 deletion, PD-L1 TPS 80%; first-line therapy?)",
-        fs_title=10.5, fs_body=8)
+IN = (3.5, 11.1, 5.0, 0.95)
+rbox(*IN, fc=C['input'][0], ec=C['input'][1], lw=1.4)
+stext(IN[0] + IN[2]/2, IN[1] + IN[3] - 0.27,
+      "Clinical Vignette + Question", fs=10.5, fw='bold')
+stext(IN[0] + IN[2]/2, IN[1] + 0.30,
+      "Stage IV NSCLC, EGFR exon 19 del, PD-L1 80%, first-line therapy?",
+      fs=7.8, color=C['t_dim'])
 
 
 # ══════════════════════════════════════════════════════════════════
-#  Left column: RAG Pipeline (vertical zone)
+# 2)  PHASE 1 — Specialists container (center)
 # ══════════════════════════════════════════════════════════════════
-zone(0.25, 2.65, 3.7, 5.75, "RAG Pipeline", color=COLOR['rag_text'])
+P1 = (2.0, 8.0, 8.0, 2.55)
+rbox(*P1, fc=C['phase1'][0], ec=C['phase1'][1], lw=1.6, r=0.18, zorder=1)
 
-RAG_BOXES = [
-    (0.55, 7.35, 3.1, 0.85, "NCCN Guidelines",   "4 PDFs · 618 pages"),
-    (0.55, 6.25, 3.1, 0.85, "Chunking",           "size=512, overlap=128\n|C| = 6,252"),
-    (0.55, 5.15, 3.1, 0.85, "Dense Embedding",    "text-embedding-3-large\nd = 3,072"),
-    (0.55, 4.05, 3.1, 0.85, "FAISS Index",        "IndexFlatIP"),
-    (0.55, 2.95, 3.1, 0.85, "Top-k Retrieval",    "k = 5"),
+# Header inside phase-1
+stext(P1[0] + 0.25, P1[1] + P1[3] - 0.22,
+      "Phase 1 — Specialist Agents (parallel, independent)",
+      fs=9.2, fw='bold', color=C['phase1'][1], ha='left')
+
+# 4 agent cards (compact)
+AGENT_Y, AGENT_H, AGENT_W = 8.25, 1.75, 1.75
+AGENT_X = [2.22, 4.17, 6.12, 8.07]
+AGENT_LABELS = [
+    ("Medical\nOncologist", "Chemo · Targeted · IO"),
+    ("Thoracic\nSurgeon",   "Surgical candidacy"),
+    ("Radiation\nOncologist","SBRT · CRT"),
+    ("Pathologist /\nMolecular", "Biomarker interp."),
 ]
-for (x, y, w, h, t, b) in RAG_BOXES:
-    rounded(x, y, w, h, fc=COLOR['rag_fill'], ec=COLOR['rag_edge'],
-            lw=1.0, alpha=0.95)
-    text_in(x, y, w, h, title=t, body=b,
-            color_title=COLOR['rag_text'], fs_title=9.2, fs_body=7.4)
-
-# Vertical arrows inside RAG pipeline
-for i in range(len(RAG_BOXES) - 1):
-    x_top, y_top = RAG_BOXES[i][0] + RAG_BOXES[i][2]/2, RAG_BOXES[i][1]
-    x_bot, y_bot = RAG_BOXES[i+1][0] + RAG_BOXES[i+1][2]/2, RAG_BOXES[i+1][1] + RAG_BOXES[i+1][3]
-    arrow(x_top, y_top, x_bot, y_bot, color=COLOR['arrow_rag'], lw=1.0)
+for (x, (title, sub)) in zip(AGENT_X, AGENT_LABELS):
+    rbox(x, AGENT_Y, AGENT_W, AGENT_H,
+         fc=C['agent'][0], ec=C['agent'][1], lw=1.0, r=0.10)
+    stext(x + AGENT_W/2, AGENT_Y + 1.15, title,
+          fs=8.8, fw='bold', color=C['phase1'][1])
+    stext(x + AGENT_W/2, AGENT_Y + 0.35, sub,
+          fs=7.3, color=C['t_dim'])
 
 
 # ══════════════════════════════════════════════════════════════════
-#  Center: PHASE 1 — 4 specialist agents (parallel)
+# 3)  RAG SIDECAR (left of Phase 1)
 # ══════════════════════════════════════════════════════════════════
-zone(4.4, 5.55, 13.3, 2.7, "Phase 1 — Specialists (parallel, independent)",
-     color=COLOR['spec_text'])
+RAG = (0.12, 8.25, 1.72, 2.3)
+rbox(*RAG, fc=C['rag'][0], ec=C['rag'][1], lw=1.4, r=0.14)
+stext(RAG[0] + RAG[2]/2, RAG[1] + RAG[3] - 0.22,
+      "RAG Sidecar", fs=9.5, fw='bold', color=C['rag'][1])
 
-# 4 specialist boxes — spread wider, no overlap
-SPEC_Y = 5.95
-SPEC_WIDTH, SPEC_HEIGHT = 2.85, 1.85
-SPEC_STARTS_X = [4.7, 7.9, 11.1, 14.3]
-SPEC = [
-    (SPEC_STARTS_X[0], "Medical Oncologist",   "Systemic therapy\nChemo · Targeted · IO"),
-    (SPEC_STARTS_X[1], "Thoracic Surgeon",     "Surgical candidacy\nPerioperative"),
-    (SPEC_STARTS_X[2], "Radiation Oncologist", "RT role\nSBRT · CRT · Palliative"),
-    (SPEC_STARTS_X[3], "Pathologist / Molecular",  "Histology\nBiomarker interpretation"),
+# RAG internal micro-components (small pills)
+rag_items = [
+    "NCCN · 618 pp",
+    "6,252 chunks",
+    "FAISS index",
+    "top-k = 5",
 ]
-for (x, role, desc) in SPEC:
-    rounded(x, SPEC_Y, SPEC_WIDTH, SPEC_HEIGHT,
-            fc=COLOR['spec_fill'], ec=COLOR['spec_edge'], lw=1.2)
-    text_in(x, SPEC_Y, SPEC_WIDTH, SPEC_HEIGHT, title=role, body=desc,
-            color_title=COLOR['spec_text'], fs_title=9.4, fs_body=7.7)
+pill_top_y = RAG[1] + RAG[3] - 0.60
+pill_w = RAG[2] - 0.24
+pill_h = 0.34
+pill_gap = 0.10
+for i, label in enumerate(rag_items):
+    pill_x = RAG[0] + 0.12
+    pill_y = pill_top_y - i * (pill_h + pill_gap) - pill_h
+    rbox(pill_x, pill_y, pill_w, pill_h,
+         fc='white', ec=C['rag'][1], lw=0.7, r=0.10)
+    stext(pill_x + pill_w/2, pill_y + pill_h/2, label,
+          fs=7.2, color=C['rag'][1])
+
+# RAG → Phase 1 (single augmentation arrow, dashed)
+arrow(RAG[0] + RAG[2], RAG[1] + RAG[3]/2,
+      P1[0] + 0.02, P1[1] + P1[3]/2,
+      color=C['a_rag'], lw=1.8, ls='--', mutation=20, shrink=2)
 
 
 # ══════════════════════════════════════════════════════════════════
-#  Center: PHASE 2 — Moderator
+# 4)  PHASE 2 — Moderator
 # ══════════════════════════════════════════════════════════════════
-zone(4.4, 3.2, 13.3, 1.95, "Phase 2 — Moderator Synthesis",
-     color=COLOR['mod_text'])
+P2 = (2.8, 5.45, 6.4, 1.95)
+rbox(*P2, fc=C['phase2'][0], ec=C['phase2'][1], lw=1.5, r=0.16)
+stext(P2[0] + 0.25, P2[1] + P2[3] - 0.22,
+      "Phase 2 — Moderator Synthesis",
+      fs=9.2, fw='bold', color=C['phase2'][1], ha='left')
 
-MOD = (8.2, 3.45, 5.7, 1.45)
-rounded(*MOD, fc=COLOR['mod_fill'], ec=COLOR['mod_edge'], lw=1.4)
-ax.text(MOD[0] + MOD[2]/2, MOD[1] + MOD[3] - 0.29,
-        "MDT Coordinator", ha='center', va='center',
-        fontsize=10.5, fontweight='bold', color=COLOR['mod_text'])
-ax.text(MOD[0] + MOD[2]/2, MOD[1] + 0.46,
-        "(1) Consensus treatment plan (drug · dose · schedule)\n"
-        "(2) Resolve inter-specialist disagreement\n"
-        "(3) Follow-up & monitoring",
-        ha='center', va='center', fontsize=8, color='#1F2937',
-        linespacing=1.4)
-
-
-# ══════════════════════════════════════════════════════════════════
-#  Bottom-left: OUTPUT
-# ══════════════════════════════════════════════════════════════════
-OUT = (4.4, 1.35, 4.8, 1.1)
-rounded(*OUT, fc=COLOR['out_fill'], ec=COLOR['out_edge'], lw=1.5)
-text_in(*OUT, title="Final MDT Recommendation",
-        body="Consensus output to evaluator",
-        color_title='#312E81', fs_title=10, fs_body=7.8)
+MOD = (3.3, 5.70, 5.4, 1.35)
+rbox(*MOD, fc=C['moderator'][0], ec=C['moderator'][1], lw=1.4, r=0.12)
+stext(MOD[0] + MOD[2]/2, MOD[1] + MOD[3] - 0.30,
+      "MDT Coordinator", fs=10.5, fw='bold', color=C['phase2'][1])
+stext(MOD[0] + MOD[2]/2, MOD[1] + 0.42,
+      "(1) Consensus plan  ·  (2) Resolve disagreement  ·  (3) Follow-up",
+      fs=7.7, color='#1F2937')
 
 
 # ══════════════════════════════════════════════════════════════════
-#  Bottom-right: EVALUATION (2 judges + gold)
+# 5)  OUTPUT
 # ══════════════════════════════════════════════════════════════════
-zone(9.55, 0.45, 8.15, 2.3, "LLM-as-Judge Evaluation",
-     color=COLOR['eval_text'])
+OUT = (3.5, 3.55, 5.0, 1.0)
+rbox(*OUT, fc=C['output'][0], ec=C['output'][1], lw=1.5, r=0.14)
+stext(OUT[0] + OUT[2]/2, OUT[1] + OUT[3] - 0.28,
+      "Final MDT Recommendation", fs=10.5, fw='bold', color=C['output'][1])
+stext(OUT[0] + OUT[2]/2, OUT[1] + 0.32,
+      "Consensus output for evaluation",
+      fs=7.8, color=C['t_dim'])
 
-# Gold standard
-GOLD = (9.85, 1.55, 2.2, 0.95)
-rounded(*GOLD, fc=COLOR['gold_fill'], ec=COLOR['gold_edge'], lw=1.1)
-text_in(*GOLD, title="Gold Standard",
-        body="Expert-annotated\n(NCCN-grounded)",
-        color_title='#713F12', fs_title=9, fs_body=7.5)
+
+# ══════════════════════════════════════════════════════════════════
+# 6)  EVALUATION container (bottom)
+# ══════════════════════════════════════════════════════════════════
+EV = (1.2, 0.35, 9.6, 2.55)
+rbox(*EV, fc=C['evalbg'][0], ec=C['evalbg'][1], lw=1.5, r=0.16)
+stext(EV[0] + 0.25, EV[1] + EV[3] - 0.22,
+      "LLM-as-Judge Evaluation",
+      fs=9.2, fw='bold', color=C['evalbg'][1], ha='left')
+
+# Gold standard (left)
+GOLD = (1.55, 1.1, 2.05, 1.15)
+rbox(*GOLD, fc=C['gold'][0], ec=C['gold'][1], lw=1.2, r=0.12)
+stext(GOLD[0] + GOLD[2]/2, GOLD[1] + GOLD[3] - 0.30,
+      "Gold Standard", fs=9.2, fw='bold', color=C['gold'][1])
+stext(GOLD[0] + GOLD[2]/2, GOLD[1] + 0.35,
+      "Expert-annotated\nNCCN-grounded",
+      fs=7.4, color=C['t_dim'])
 
 # Judge 1
-J1 = (12.35, 1.55, 2.35, 0.95)
-rounded(*J1, fc=COLOR['eval_fill'], ec=COLOR['eval_edge'], lw=1.1)
-text_in(*J1, title="Judge J\u2081",
-        body="GPT-4o-mini",
-        color_title=COLOR['eval_text'], fs_title=9, fs_body=7.5)
+J1 = (4.25, 1.1, 2.05, 1.15)
+rbox(*J1, fc=C['judge'][0], ec=C['judge'][1], lw=1.2, r=0.12)
+stext(J1[0] + J1[2]/2, J1[1] + J1[3] - 0.30,
+      "Judge  J\u2081", fs=9.2, fw='bold', color=C['judge'][1])
+stext(J1[0] + J1[2]/2, J1[1] + 0.35,
+      "GPT-4o-mini\n(OpenAI)", fs=7.4, color=C['t_dim'])
 
 # Judge 2
-J2 = (15.0, 1.55, 2.4, 0.95)
-rounded(*J2, fc=COLOR['eval_fill'], ec=COLOR['eval_edge'], lw=1.1)
-text_in(*J2, title="Judge J\u2082",
-        body="Claude Sonnet 4.5",
-        color_title=COLOR['eval_text'], fs_title=9, fs_body=7.5)
+J2 = (6.95, 1.1, 2.05, 1.15)
+rbox(*J2, fc=C['judge'][0], ec=C['judge'][1], lw=1.2, r=0.12)
+stext(J2[0] + J2[2]/2, J2[1] + J2[3] - 0.30,
+      "Judge  J\u2082", fs=9.2, fw='bold', color=C['judge'][1])
+stext(J2[0] + J2[2]/2, J2[1] + 0.35,
+      "Claude Sonnet 4.5\n(Anthropic)", fs=7.4, color=C['t_dim'])
 
-# Score dimensions
-SCORES = (9.85, 0.6, 7.55, 0.85)
-rounded(*SCORES, fc="white", ec=COLOR['eval_edge'], lw=0.9, alpha=0.95)
-ax.text(SCORES[0] + SCORES[2]/2, SCORES[1] + SCORES[3]/2,
-        "Scoring rubric: Accuracy · Completeness · Safety · Concordance (1–5)  |  "
-        "Hallucination · Safety-violation (0/1)",
-        ha='center', va='center', fontsize=7.8, color=COLOR['eval_text'])
+# Scores output (right)
+SCORE = (9.55, 1.1, 1.15, 1.15)
+rbox(*SCORE, fc='white', ec=C['evalbg'][1], lw=1.2, r=0.12)
+stext(SCORE[0] + SCORE[2]/2, SCORE[1] + SCORE[3] - 0.30,
+      "Scores", fs=9.2, fw='bold', color=C['evalbg'][1])
+stext(SCORE[0] + SCORE[2]/2, SCORE[1] + 0.40,
+      "4×(1-5)\n+ 2×(0/1)",
+      fs=7.2, color=C['evalbg'][1])
 
+# Internal arrows in evaluation: Gold → Judges, Judges → Scores
+arrow(GOLD[0] + GOLD[2], GOLD[1] + GOLD[3]/2,
+      J1[0], J1[1] + J1[3]/2, color=C['a_eval'], lw=1.0, ls=':',
+      mutation=12)
+arrow(J1[0] + J1[2], J1[1] + J1[3]/2,
+      J2[0], J2[1] + J2[3]/2, color=C['a_eval'], lw=1.0, ls=':',
+      mutation=12)
+arrow(J2[0] + J2[2], J2[1] + J2[3]/2,
+      SCORE[0], SCORE[1] + SCORE[3]/2, color=C['a_eval'], lw=1.0, ls=':',
+      mutation=12)
 
-# ══════════════════════════════════════════════════════════════════
-#  ARROWS (no overlap, clear semantic grouping)
-# ══════════════════════════════════════════════════════════════════
-# 1) INPUT → each specialist (main solid)
-input_cx, input_by = INPUT[0] + INPUT[2]/2, INPUT[1]
-for (x, _, _) in SPEC:
-    arrow(input_cx, input_by,
-          x + SPEC_WIDTH/2, SPEC_Y + SPEC_HEIGHT + 0.02,
-          color=COLOR['arrow_main'], lw=1.15)
-
-# 2) RAG retrieval → each specialist (dashed green)
-rag_out_x = RAG_BOXES[-1][0] + RAG_BOXES[-1][2]
-rag_out_y = RAG_BOXES[-1][1] + RAG_BOXES[-1][3]/2
-for (x, _, _) in SPEC:
-    arrow(rag_out_x, rag_out_y,
-          x + 0.12, SPEC_Y + SPEC_HEIGHT/2,
-          color=COLOR['arrow_rag'], lw=1.0, ls='--')
-# RAG → Moderator (dashed green)
-arrow(rag_out_x, rag_out_y,
-      MOD[0] + 0.12, MOD[1] + MOD[3]/2,
-      color=COLOR['arrow_rag'], lw=1.0, ls='--')
-
-# 3) Each specialist → moderator (solid blue funnel)
-mod_top_cx = MOD[0] + MOD[2]/2
-mod_top_y  = MOD[1] + MOD[3]
-for (x, _, _) in SPEC:
-    arrow(x + SPEC_WIDTH/2, SPEC_Y,
-          mod_top_cx, mod_top_y,
-          color=COLOR['arrow_main'], lw=1.1)
-
-# 4) Moderator → Output (short diagonal from mod bottom-left to output top-right)
-arrow(MOD[0] + 0.5, MOD[1],
-      OUT[0] + OUT[2] - 0.3, OUT[1] + OUT[3],
-      color=COLOR['arrow_main'], lw=1.5)
-
-# 5) Output → Judges (dotted magenta)
-out_r_x, out_r_y = OUT[0] + OUT[2], OUT[1] + OUT[3]/2
-arrow(out_r_x, out_r_y,
-      J1[0], J1[1] + J1[3]/2,
-      color=COLOR['arrow_eval'], lw=1.1, ls=':')
-arrow(out_r_x, out_r_y,
-      J2[0], J2[1] + J2[3]/2,
-      color=COLOR['arrow_eval'], lw=1.1, ls=':')
-
-# 6) Gold standard → Judges (dotted)
-g_r_x, g_r_y = GOLD[0] + GOLD[2], GOLD[1] + GOLD[3]/2
-arrow(g_r_x, g_r_y, J1[0], J1[1] + J1[3]/2,
-      color=COLOR['arrow_eval'], lw=0.8, ls=':')
-arrow(g_r_x, g_r_y, J2[0], J2[1] + J2[3]/2,
-      color=COLOR['arrow_eval'], lw=0.8, ls=':')
+# Rubric line at the bottom of Eval container
+stext(EV[0] + EV[2]/2, EV[1] + 0.62,
+      "Dimensions:  Accuracy · Completeness · Safety · Concordance"
+      "  |  Flags:  Hallucination · Safety-violation",
+      fs=7.4, color=C['evalbg'][1], fw='normal')
 
 
 # ══════════════════════════════════════════════════════════════════
-#  LEGEND (bottom-center, clean)
+#  MAIN SPINE ARROWS (only 4!)
+# ══════════════════════════════════════════════════════════════════
+# Input → Phase 1
+arrow(IN[0] + IN[2]/2, IN[1],
+      P1[0] + P1[2]/2, P1[1] + P1[3],
+      color=C['a_main'], lw=2.0, mutation=20)
+stext(IN[0] + IN[2]/2 + 0.15, (IN[1] + P1[1] + P1[3])/2 + 0.05,
+      "broadcast",
+      fs=7.2, color=C['t_dim'], style='italic', ha='left')
+
+# Phase 1 → Phase 2
+arrow(P1[0] + P1[2]/2, P1[1],
+      P2[0] + P2[2]/2, P2[1] + P2[3],
+      color=C['a_main'], lw=2.0, mutation=20)
+stext(P1[0] + P1[2]/2 + 0.15, (P1[1] + P2[1] + P2[3])/2 + 0.03,
+      "4 opinions",
+      fs=7.2, color=C['t_dim'], style='italic', ha='left')
+
+# Phase 2 → Output
+arrow(P2[0] + P2[2]/2, P2[1],
+      OUT[0] + OUT[2]/2, OUT[1] + OUT[3],
+      color=C['a_main'], lw=2.0, mutation=20)
+stext(P2[0] + P2[2]/2 + 0.15, (P2[1] + OUT[1] + OUT[3])/2 + 0.03,
+      "consensus",
+      fs=7.2, color=C['t_dim'], style='italic', ha='left')
+
+# Output → Evaluation
+arrow(OUT[0] + OUT[2]/2, OUT[1],
+      OUT[0] + OUT[2]/2, EV[1] + EV[3],
+      color=C['a_main'], lw=2.0, mutation=20)
+stext(OUT[0] + OUT[2]/2 + 0.15, (OUT[1] + EV[1] + EV[3])/2 + 0.03,
+      "evaluate",
+      fs=7.2, color=C['t_dim'], style='italic', ha='left')
+
+
+# ══════════════════════════════════════════════════════════════════
+#  LEGEND (bottom-right corner, compact)
 # ══════════════════════════════════════════════════════════════════
 legend_elements = [
-    Line2D([0], [0], color=COLOR['arrow_main'], lw=1.6, label='Main flow'),
-    Line2D([0], [0], color=COLOR['arrow_rag'],  lw=1.4, linestyle='--',
-           label='RAG context (RAG conditions only)'),
-    Line2D([0], [0], color=COLOR['arrow_eval'], lw=1.2, linestyle=':',
+    Line2D([0], [0], color=C['a_main'], lw=2.0, label='Main flow'),
+    Line2D([0], [0], color=C['a_rag'],  lw=1.5, linestyle='--',
+           label='RAG augmentation'),
+    Line2D([0], [0], color=C['a_eval'], lw=1.2, linestyle=':',
            label='Evaluation'),
 ]
 leg = ax.legend(handles=legend_elements,
-                loc='lower left', bbox_to_anchor=(0.005, 0.01),
+                loc='upper right', bbox_to_anchor=(0.98, 0.96),
                 fontsize=8.5, frameon=True, framealpha=0.95,
-                edgecolor='#CBD5E1', ncol=1,
-                handlelength=2.2, borderpad=0.5)
+                edgecolor='#CBD5E1', ncol=1, handlelength=2.3,
+                borderpad=0.55, title="Edge semantics",
+                title_fontsize=9)
 leg.get_frame().set_linewidth(0.6)
 
 
@@ -307,4 +310,4 @@ for out in ["outputs/figures/fig1_architecture.png",
             "paper/latex/figures/fig1_architecture.png",
             "paper/latex/figures/fig1_architecture.pdf"]:
     plt.savefig(out)
-print("Saved fig1_architecture (PNG + PDF, v2 redesign)")
+print("Saved fig1_architecture v3 (minimalist, single-axis flow)")
