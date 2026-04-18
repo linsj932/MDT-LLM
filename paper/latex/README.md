@@ -54,8 +54,8 @@ pdflatex main.tex
 
 - [ ] Fill in author names and affiliations in `main.tex` (lines 44–53).
 - [ ] Fill in corresponding author email (line 46).
-- [ ] Fill in `[org]` placeholder in Data and code availability section
-      with the real GitHub URL.
+- [x] ~~Fill in `[org]` placeholder in Data and code availability section
+      with the real GitHub URL.~~ → Done: https://github.com/deepdoctor/MDT-LLM
 - [ ] Replace `[reviewers / funding sources]` in Acknowledgments.
 - [ ] Check the "Suggested reviewers" in `cover_letter.tex`.
 - [ ] (Optional) Switch from `3p` (single-column) to `5p` (two-column

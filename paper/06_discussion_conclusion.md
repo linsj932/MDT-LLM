@@ -114,8 +114,7 @@ The authors declare no competing interests.
 
 ## Data and Code Availability
 
-- Benchmark: `https://github.com/[org]/LungMDT-Bench-100`
-- Framework implementation: `https://github.com/[org]/MDT-LLM`
+- Benchmark + framework: `https://github.com/deepdoctor/MDT-LLM` (includes `all_100_questions.csv`)
 - Judge scoring outputs (full CSV): Supplementary File S1.
 
 ## Funding
