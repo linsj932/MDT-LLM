@@ -7,7 +7,7 @@
 
 ## Title
 
-**MDT-LLM: A Multidisciplinary Team-Based Multi-Agent Large Language Model Framework with Retrieval-Augmented Generation for Evidence-Based Clinical Decision Support**
+**MDT-LLM: A Multi-Agent Large Language Model Framework with Retrieval-Augmented Generation for Lung Cancer Multidisciplinary Decision Support**
 
 Shorter variant for running head: *MDT-LLM: Multi-Agent LLM for Clinical Decision Support*
 

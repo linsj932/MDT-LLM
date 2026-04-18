@@ -1,14 +1,14 @@
-# MDT-LLM: A Multidisciplinary Team-Based Multi-Agent LLM Framework with RAG for Clinical Decision Support
+# MDT-LLM: A Multi-Agent LLM Framework with RAG for Lung Cancer Multidisciplinary Decision Support
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/)
 [![Paper](https://img.shields.io/badge/paper-JKSUCIS-red)](#)
 
 Open-source framework and benchmark accompanying our paper
-**"MDT-LLM: A Multidisciplinary Team-Based Multi-Agent Large Language
-Model Framework with Retrieval-Augmented Generation for Evidence-Based
-Clinical Decision Support"**, submitted to *Journal of King Saud
-University - Computer and Information Sciences* (JKSUCIS).
+**"MDT-LLM: A Multi-Agent Large Language Model Framework with
+Retrieval-Augmented Generation for Lung Cancer Multidisciplinary
+Decision Support"**, submitted to *Journal of King Saud University -
+Computer and Information Sciences* (JKSUCIS).
 
 ---
 
@@ -218,9 +218,9 @@ ablations) the aggregate spend is approximately **USD 39**:
 
 ```bibtex
 @article{MDTLLM2026,
-  title   = {MDT-LLM: A Multidisciplinary Team-Based Multi-Agent
-             Large Language Model Framework with Retrieval-Augmented
-             Generation for Evidence-Based Clinical Decision Support},
+  title   = {MDT-LLM: A Multi-Agent Large Language Model Framework
+             with Retrieval-Augmented Generation for Lung Cancer
+             Multidisciplinary Decision Support},
   author  = {First Author and Second Author and Senior Author},
   journal = {Journal of King Saud University - Computer and
              Information Sciences},
