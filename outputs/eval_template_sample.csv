@@ -1,0 +1,9 @@
+question_id,domain,model,condition,evaluator,accuracy,completeness,safety,concordance,hallucination,safety_violation,notes
+Q001,D1_Diagnosis_Screening,gpt-4o,single_zeroshot,Evaluator_1,,,,,,
+Q001,D1_Diagnosis_Screening,gpt-4o,single_rag,Evaluator_1,,,,,,
+Q001,D1_Diagnosis_Screening,gpt-4o,mdt_zeroshot,Evaluator_1,,,,,,
+Q001,D1_Diagnosis_Screening,gpt-4o,mdt_rag,Evaluator_1,,,,,,
+Q001,D1_Diagnosis_Screening,deepseek-r1,single_zeroshot,Evaluator_1,,,,,,
+Q001,D1_Diagnosis_Screening,deepseek-r1,single_rag,Evaluator_1,,,,,,
+Q001,D1_Diagnosis_Screening,deepseek-r1,mdt_zeroshot,Evaluator_1,,,,,,
+Q001,D1_Diagnosis_Screening,deepseek-r1,mdt_rag,Evaluator_1,,,,,,

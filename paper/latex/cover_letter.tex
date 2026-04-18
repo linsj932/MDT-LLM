@@ -1,0 +1,91 @@
+\documentclass[11pt,a4paper]{letter}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{hyperref}
+
+\signature{[First Author, PhD/MD]\\
+[Corresponding Author]\\
+[Department], [Institution]\\
+\url{first.author@institution.edu}}
+
+\begin{document}
+
+\begin{letter}{%
+The Editor-in-Chief\\
+\textit{Journal of King Saud University - Computer and Information Sciences}\\
+King Saud University\\
+Riyadh, Saudi Arabia}
+
+\opening{Dear Editor,}
+
+We are pleased to submit our manuscript entitled \textbf{``MDT-LLM:
+A Multidisciplinary Team-Based Multi-Agent Large Language Model
+Framework with Retrieval-Augmented Generation for Evidence-Based
+Clinical Decision Support''} for consideration in the
+\textit{Journal of King Saud University --- Computer and Information
+Sciences}.
+
+This work presents the first systematic factorial benchmarking of
+multi-agent LLM orchestration combined with retrieval-augmented
+generation (RAG) on complex clinical decision-making tasks. Our
+contributions are four-fold:
+
+\begin{enumerate}
+\item \textbf{A novel multi-agent framework} (\textsc{MDT-LLM}) that
+simulates the role composition and synthesis structure of a clinical
+multidisciplinary team (MDT), coupled with a RAG pipeline over the
+current NCCN guidelines.
+
+\item \textbf{A new benchmark} (\textsc{LungMDT-Bench-100}) of 100
+expert-annotated lung-cancer clinical scenarios across 6 clinical
+domains and 3 difficulty levels, accompanied by guideline-concordant
+gold-standard answers.
+
+\item \textbf{A cross-provider multi-judge LLM-as-judge protocol} with
+explicit inter-judge reliability reporting (Cohen's weighted $\kappa$),
+applicable beyond our specific domain.
+
+\item \textbf{Counter-intuitive empirical findings.} We show that naive
+RAG \emph{reduces} output quality in strong LLMs (Claude Sonnet 4.5
+$\Delta{=}{-}0.29$ and DeepSeek R1 $\Delta{=}{-}0.32$, both
+Bonferroni-corrected $p<0.002$, medium effect size), a finding robust
+across retrieval depths $k \in \{1, 3, 5, 10\}$. We further show that a
+\emph{heterogeneous} multi-agent configuration, mixing four different
+LLMs across four specialist roles, achieves performance parity with
+the best homogeneous configuration at approximately 32\% lower cost.
+\end{enumerate}
+
+We believe this work aligns well with \textit{JKSUCIS}'s scope, which
+spans foundational and applied advances in computer and information
+sciences including artificial intelligence, machine learning, and
+medical informatics. Our multi-agent system design and evaluation
+methodology represent substantive methodological contributions to the
+field of applied large language models in high-stakes domains.
+
+\textbf{Originality and exclusivity.} This manuscript has not been
+published previously and is not under consideration elsewhere. All
+authors have approved the submission. We have no conflicts of
+interest to disclose.
+
+\textbf{Reproducibility.} The full benchmark, framework
+implementation, judge score CSVs, and analysis scripts are released
+as open-source artifacts accompanying this submission.
+
+\textbf{Suggested reviewers} (at the Editor's discretion):
+
+\begin{itemize}
+\item Prof.\ [Name], [Institution] --- expert in clinical NLP and
+  medical LLM evaluation.
+\item Dr.\ [Name], [Institution] --- expert in multi-agent systems
+  and LLM orchestration.
+\item Prof.\ [Name], [Institution] --- expert in retrieval-augmented
+  generation for knowledge-intensive tasks.
+\end{itemize}
+
+Thank you for considering our work. We look forward to your decision.
+
+\closing{Sincerely,}
+
+\end{letter}
+
+\end{document}

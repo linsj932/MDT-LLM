@@ -1,0 +1,70 @@
+# ===== Secrets & credentials =====
+.env
+.env.local
+.env.*.local
+*.key
+*_secret*
+credentials.json
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+env/
+.Python
+
+# ===== IDE / OS =====
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+Thumbs.db
+
+# ===== Generated artifacts (too big for git) =====
+# FAISS index (regenerate locally from PDFs)
+data/faiss_index/
+
+# NCCN PDFs are copyrighted; users must download themselves.
+# Comments MUST be on their own line in .gitignore (no trailing #).
+data/guidelines/
+# Ignore PDFs by default, but allow the architecture figure PDF
+*.pdf
+!paper/latex/figures/fig1_architecture.pdf
+
+# Full experiment outputs (kept as supplementary, not in repo)
+outputs/*.jsonl
+outputs/*.log
+outputs/parallel_*.log
+outputs/full_run.log
+outputs/validation_run.log
+outputs/judge_*.log
+outputs/ablation_*.log
+outputs/run_*.jsonl
+outputs/ablation_*.jsonl
+
+# ===== LaTeX build artifacts =====
+paper/latex/*.aux
+paper/latex/*.bbl
+paper/latex/*.blg
+paper/latex/*.log
+paper/latex/*.out
+paper/latex/*.toc
+paper/latex/*.synctex.gz
+paper/latex/*.fdb_latexmk
+paper/latex/*.fls
+paper/latex/main.pdf
+paper/mdt-llm-jksucis.zip
+
+# Claude/AI assistant directories
+.claude/

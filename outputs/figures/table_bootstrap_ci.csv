@@ -1,0 +1,17 @@
+model,condition,mean,ci_lo,ci_hi,n
+gpt-4o-mini,single_zeroshot,3.91125,3.77871875,4.03875,100
+gpt-4o-mini,single_rag,3.83,3.69125,3.9700312500000003,100
+gpt-4o-mini,mdt_zeroshot,3.94625,3.80625,4.095093749999999,100
+gpt-4o-mini,mdt_rag,3.96125,3.82375,4.10253125,100
+claude-sonnet,single_zeroshot,4.55875,4.45740625,4.655,100
+claude-sonnet,single_rag,4.265,4.12125,4.39253125,100
+claude-sonnet,mdt_zeroshot,4.6475,4.53875,4.75125,100
+claude-sonnet,mdt_rag,4.59875,4.47875,4.7175,100
+deepseek-r1,single_zeroshot,4.575,4.44121875,4.70625,100
+deepseek-r1,single_rag,4.2575,4.11375,4.4125,100
+deepseek-r1,mdt_zeroshot,4.62875,4.519937499999999,4.7238125,100
+deepseek-r1,mdt_rag,4.53375,4.405,4.65628125,100
+llama-3.3-70b,single_zeroshot,3.79125,3.65125,3.9275625,100
+llama-3.3-70b,single_rag,3.67125,3.53,3.8075,100
+llama-3.3-70b,mdt_zeroshot,3.71125,3.54375,3.86878125,100
+llama-3.3-70b,mdt_rag,3.81125,3.67240625,3.9587812500000004,100

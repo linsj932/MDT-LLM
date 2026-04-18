@@ -1,0 +1,12 @@
+error_type,count,pct_of_low_scoring,example_qid,example_excerpt
+no_guideline_citation,181,37.6,Q052,"Based on the provided clinical guideline excerpts, for a patient with EGFR exon 19 deletion stage IV NSCLC who has progressed on first-line osimertinib and then platinum/pemetrexed, and has developed "
+missing_driver_mutation_priority,41,8.5,Q080,"**Recommendation:**  
+For this patient with synchronous oligometastatic NSCLC (primary + 2 contralateral lung metastases), PD-L1 TPS 50%, no actionable driver mutations, and good performance status (E"
+fabricated_trial,6,1.2,Q086,"**Consensus MDT Recommendation:**
+
+Based on the inputs from the medical oncologist, thoracic surgeon, radiation oncologist, and pathologist, the multidisciplinary tumor board (MDT) recommends the foll"
+vague_dosing,3,0.6,Q084,"### Multidisciplinary Tumor Board Consensus Recommendation for Treatment of NSCLC with MET Exon 14 Skipping Mutation After Progression on Capmatinib
+
+**Patient Profile:**
+- 65-year-old male
+- Diagnosi"

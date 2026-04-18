@@ -1,0 +1,11 @@
+config,mean_score,cost_per_q
+"Llama-3.3-70B
+(homo)",4.0725,0.02
+"GPT-4o-mini
+(homo)",4.42,0.005
+"Claude-Sonnet
+(homo)",4.7125,0.25
+"DeepSeek-R1
+(homo)",4.7625,0.05
+"HETERO
+(all 4 mixed)",4.7275,0.17

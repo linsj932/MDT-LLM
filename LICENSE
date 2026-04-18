@@ -1,0 +1,40 @@
+MIT License
+
+Copyright (c) 2026 MDT-LLM Authors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+# ─────────────────────────────────────────────────────────────────────────
+# NOTICE REGARDING NCCN CLINICAL GUIDELINES
+# ─────────────────────────────────────────────────────────────────────────
+# The NCCN Clinical Practice Guidelines referenced by this benchmark are
+# © National Comprehensive Cancer Network® (NCCN®). NCCN guideline PDFs
+# are NOT redistributed in this repository. Users must obtain their own
+# copies directly from https://www.nccn.org/ under NCCN's End-User License
+# Agreement. This repository distributes only the LungMDT-Bench-100
+# benchmark (original clinical scenarios with references to NCCN sections)
+# and the MDT-LLM framework code, which are the original creative work of
+# this project's authors.
+#
+# NOTICE REGARDING MEDICAL USE
+# ─────────────────────────────────────────────────────────────────────────
+# This software is a research prototype for evaluating large language models
+# on oncology decision-support benchmarks. It is NOT a medical device and is
+# NOT intended for direct clinical use. All clinical decisions must be made
+# by qualified healthcare professionals.

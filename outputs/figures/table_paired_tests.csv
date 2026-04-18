@@ -1,0 +1,13 @@
+model,comparison,n,median_diff,mean_diff,wilcoxon_stat,p_value,cliffs_delta,effect_size,p_bonferroni,p_fdr_bh,sig_bonf
+gpt-4o-mini,single_rag vs single_zeroshot,100,0.0,-0.08125,1437.0,0.21997386321491774,-0.0434,negligible,1.0,0.37709805122557327,False
+gpt-4o-mini,mdt_zeroshot vs single_zeroshot,100,0.0,0.035,1782.5,0.8433273186172029,0.0452,negligible,1.0,0.8433273186172029,False
+gpt-4o-mini,mdt_rag vs single_zeroshot,100,0.0625,0.05,1749.0,0.48412301119820755,0.0734,negligible,1.0,0.6454973482642767,False
+claude-sonnet,single_rag vs single_zeroshot,100,-0.125,-0.29375,811.0,0.0001017449493808003,-0.2831,small,0.0012209393925696037,0.001048972988277793,True
+claude-sonnet,mdt_zeroshot vs single_zeroshot,100,0.0625,0.08875,960.0,0.04612976421816949,0.1812,small,0.5535571706180339,0.1383892926545085,False
+claude-sonnet,mdt_rag vs single_zeroshot,100,0.0,0.04,1119.0,0.2014668677189101,0.1557,small,1.0,0.37709805122557327,False
+deepseek-r1,single_rag vs single_zeroshot,100,-0.125,-0.3175,865.0,0.00017482883137963213,-0.3558,medium,0.0020979459765555855,0.001048972988277793,True
+deepseek-r1,mdt_zeroshot vs single_zeroshot,100,0.0,0.05375,963.0,0.6054782561344987,-0.0096,negligible,1.0,0.6927589924053308,False
+deepseek-r1,mdt_rag vs single_zeroshot,100,0.0,-0.04125,1000.0,0.6350290763715531,-0.0482,negligible,1.0,0.6927589924053308,False
+llama-3.3-70b,single_rag vs single_zeroshot,100,-0.125,-0.12,1412.0,0.03325804873576912,-0.1082,negligible,0.3990965848292294,0.13303219494307647,False
+llama-3.3-70b,mdt_zeroshot vs single_zeroshot,100,0.0,-0.08,1599.5,0.18219679572683967,-0.053,negligible,1.0,0.37709805122557327,False
+llama-3.3-70b,mdt_rag vs single_zeroshot,100,-0.1875,0.02,1816.0,0.4445315638382905,-0.0002,negligible,1.0,0.6454973482642767,False
