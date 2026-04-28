@@ -114,7 +114,7 @@ The authors declare no competing interests.
 
 ## Data and Code Availability
 
-- Benchmark + framework: `https://github.com/deepdoctor/MDT-LLM` (includes `all_100_questions.csv`)
+- Benchmark + framework: `https://github.com/linsj932/MDT-LLM` (includes `all_100_questions.csv`)
 - Judge scoring outputs (full CSV): Supplementary File S1.
 
 ## Funding
